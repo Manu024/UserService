@@ -1,9 +1,6 @@
 package com.example.authorizationservice.models;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,4 +15,15 @@ public abstract class BaseModel {
     private Long id;
     private Date createdAt;
     private Date updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        Date date = new Date();
+        createdAt = date;
+        updatedAt = date;
+    }
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = new Date();
+    }
 }

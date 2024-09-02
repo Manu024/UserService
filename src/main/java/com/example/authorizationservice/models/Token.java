@@ -15,4 +15,16 @@ public class Token extends BaseModel {
     @ManyToOne
     private User user;
     private Date expiryAt;
+    private boolean isDeleted;
+
+    public Token(String value, User user, Date expiryAt) {
+        this.value = value;
+        this.user = user;
+        this.expiryAt = expiryAt;
+        this.isDeleted = false;
+    }
+
+    public Token() {
+
+    }
 }
