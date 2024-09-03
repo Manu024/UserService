@@ -1,6 +1,8 @@
 package com.example.authorizationservice.models;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,6 +13,8 @@ import java.util.Date;
 @Getter
 @Setter
 public class Token extends BaseModel {
+    @Lob
+    @Column(length = 2048)
     private String value;
     @ManyToOne
     private User user;
