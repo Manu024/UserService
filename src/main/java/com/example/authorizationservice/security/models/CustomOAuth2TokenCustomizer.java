@@ -1,5 +1,7 @@
 package com.example.authorizationservice.security.models;
 
+import com.example.authorizationservice.dtos.UserSignInEmailDto;
+import com.example.authorizationservice.services.KafkaProducerService;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
@@ -15,9 +17,11 @@ import java.util.stream.Collectors;
 public class CustomOAuth2TokenCustomizer implements OAuth2TokenCustomizer<JwtEncodingContext> {
 
     private final CustomJwtEncoder customJwtEncoder;
+    private KafkaProducerService kafkaProducerService;
 
-    public CustomOAuth2TokenCustomizer(CustomJwtEncoder customJwtEncoder) {
+    public CustomOAuth2TokenCustomizer(CustomJwtEncoder customJwtEncoder, KafkaProducerService kafkaProducerService) {
         this.customJwtEncoder = customJwtEncoder;
+        this.kafkaProducerService = kafkaProducerService;
     }
 
     @Override
@@ -33,11 +37,21 @@ public class CustomOAuth2TokenCustomizer implements OAuth2TokenCustomizer<JwtEnc
             JwtClaimsSet claims = context.getClaims().build();
             // Encode and store the token using the custom encoder
             String tokenValue = customJwtEncoder.encodeAndStore(claims);
-//
+            sendUserSignInEmail("ecommapp@gmail.com", context.getPrincipal().getName(), "You have signed in successfully");
 //            System.out.println("jwt token2: " + tokenValue);
 
             // Optionally, you can update the context with the stored token
             // (not necessary in this case since it would be the same)
         }
+    }
+
+    private void sendUserSignInEmail(String from, String to, String message) {
+        // Send an email to the user to notify them of the sign in
+        UserSignInEmailDto userSignInEmailDto = new UserSignInEmailDto();
+        userSignInEmailDto.setFrom(from);
+        userSignInEmailDto.setTo(to);
+        userSignInEmailDto.setMessage(message);
+
+        kafkaProducerService.sendUserSignInMail(userSignInEmailDto);
     }
 }
